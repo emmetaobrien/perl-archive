@@ -50,12 +50,13 @@ open (OUTPUT_FIXED,">$output_fixedcol_filename") || die "Cannot open $output_fix
 
 # split column header line and extract all column headers
 
-@columns = split(/\t/, $intake_line);			# split header line at tabs
-print "File contains scalar(@columns) columns\n";
+my @columns = split(/\t/, $intake_line);			# split header line at tabs
+my $c       = scalar(@columns);
+print "File contains $c columns\n";
 
-while ($column_count < scalar(@columns)) {
-	if ($columns[$column_count] > 9) {    #do we need to check patient ID format here
-		$patient_ids[$patient_count] = $1;
+while ($column_count < $c) {
+	if ($column_count > 9) {    #do we need to check patient ID format here
+		$patient_ids[$patient_count] = $columns[$column_count];
 		$patient_posns[$patient_count] = $column_count;
 		++$patient_count;
 	}
@@ -64,7 +65,7 @@ while ($column_count < scalar(@columns)) {
 
 # write out the first nine columns to a reference file
 
-$outline = join ("\t",@columns[0..8])."\n";     # concatenate fields 0 to 8
+my $outline = join ("\t",@columns[0..8])."\n";     # concatenate fields 0 to 8
 print OUTPUT_FIXED $outline;
 
 while($intake_line = <INPUT_VCF>) {
@@ -77,12 +78,11 @@ close OUTPUT_FIXED;
 
 print "First nine columns written to $output_fixedcol_filename\n";
 
-
 close INPUT_VCF;
 
 # extract and generate one file per column 
 
-for(my $n = 0;$n < 5; ++$n) {
+for(my $n = 0; $n < 5; ++$n) {     
 
 	open (INPUT_VCF, $input_file_location) || die "Cannot open $input_file_location for input";
 
@@ -105,7 +105,7 @@ for(my $n = 0;$n < 5; ++$n) {
 
 	# write out data 
 
-	print "writing out column $n $patient_ids[$n] ";
+	print "writing out column $patient_posns[$n] $patient_ids[$n] ";
 	my $output_filename = $output_directory.$input_filename_trimmed."_".$patient_ids[$n].".vcf";
 	print "to $output_filename\n";
 	open (OUTFILE, ">$output_filename") || die "Cannot open $output_filename for output";
@@ -114,7 +114,7 @@ for(my $n = 0;$n < 5; ++$n) {
 
 	my $d = 0;
 	while($d < $row_count) {
-		print OUTFILE $extract_column[$d];
+		print OUTFILE $extract_column[$d]."\n";
 		++$d;
 	}
 

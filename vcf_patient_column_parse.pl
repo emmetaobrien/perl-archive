@@ -82,7 +82,7 @@ close INPUT_VCF;
 
 # extract and generate one file per column 
 
-for(my $n = 0; $n < $patient_count; ++$n) {     
+for(my $n = 0; $n < $c; ++$n) {     
 
 	open (INPUT_VCF, $input_file_location) || die "Cannot open $input_file_location for input";
 
